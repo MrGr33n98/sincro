@@ -19,22 +19,10 @@ import AIChat from "@/pages/ai-chat";
 import CoupleProfile from "@/pages/couple-profile";
 import Upgrade from "@/pages/upgrade";
 
-// Global fetch interceptor to inject Authorization header for API calls
-const originalFetch = window.fetch;
-window.fetch = async (...args) => {
-  let [resource, config] = args;
-  if (typeof resource === "string" && resource.startsWith("/api")) {
-    const token = localStorage.getItem("sincronia_token");
-    if (token) {
-      config = config || {};
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
-    }
-  }
-  return originalFetch(resource, config);
-};
+import { setAuthTokenGetter } from "@workspace/api-client-react";
+
+// Tell the API client to inject the JWT on every request automatically
+setAuthTokenGetter(() => localStorage.getItem("sincronia_token"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
