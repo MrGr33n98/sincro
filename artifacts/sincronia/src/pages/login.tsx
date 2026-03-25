@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useLogin } from "@workspace/api-client-react";
 import { setAuthToken } from "@/hooks/use-auth";
 import { ClayCard, ClayButton, ClayInput } from "@/components/ui/clay-components";
@@ -8,6 +8,7 @@ import { Sparkles } from "lucide-react";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [, setLocation] = useLocation();
   const loginMut = useLogin();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -17,6 +18,7 @@ export default function Login() {
       {
         onSuccess: (data) => {
           setAuthToken(data.token);
+          setTimeout(() => setLocation("/app"), 100);
         }
       }
     );

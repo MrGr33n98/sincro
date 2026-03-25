@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
 import { AppLayout } from "@/components/layout/AppLayout";
+import Landing from "@/pages/landing";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import Invite from "@/pages/invite";
@@ -22,30 +23,37 @@ import Upgrade from "@/pages/upgrade";
 const originalFetch = window.fetch;
 window.fetch = async (...args) => {
   let [resource, config] = args;
-  if (typeof resource === 'string' && resource.startsWith('/api')) {
-    const token = localStorage.getItem('sincronia_token');
+  if (typeof resource === "string" && resource.startsWith("/api")) {
+    const token = localStorage.getItem("sincronia_token");
     if (token) {
       config = config || {};
       config.headers = {
         ...config.headers,
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       };
     }
   }
   return originalFetch(resource, config);
 };
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 function Router() {
   return (
     <AppLayout>
       <Switch>
+        <Route path="/" component={Landing} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/invite" component={Invite} />
         <Route path="/join/:token" component={Join} />
-        <Route path="/" component={Dashboard} />
+        <Route path="/app" component={Dashboard} />
         <Route path="/mood" component={MoodCheckIn} />
         <Route path="/ai" component={AIHub} />
         <Route path="/ai/dates" component={AIDates} />

@@ -7,7 +7,7 @@ export function BottomNav() {
   const [location] = useLocation();
 
   const tabs = [
-    { name: "Início", path: "/", icon: Home },
+    { name: "Início", path: "/app", icon: Home },
     { name: "Humor", path: "/mood", icon: Smile },
     { name: "IA Concierge", path: "/ai", icon: Sparkles },
     { name: "Perfil", path: "/couple", icon: User },
@@ -17,7 +17,7 @@ export function BottomNav() {
     <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-2 bg-gradient-to-t from-background via-background/90 to-transparent">
       <div className="clay-card !p-2 !rounded-full flex items-center justify-between">
         {tabs.map((tab) => {
-          const isActive = location === tab.path || (tab.path !== "/" && location.startsWith(tab.path));
+          const isActive = location === tab.path || (tab.path !== "/app" && location.startsWith(tab.path));
           const Icon = tab.icon;
           
           return (
