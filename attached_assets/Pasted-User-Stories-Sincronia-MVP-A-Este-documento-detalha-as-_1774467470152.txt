@@ -1,0 +1,35 @@
+User Stories: Sincronia (MVP A+++)
+Este documento detalha as principais interações e objetivos dos usuários no Sincronia.
+
+1. Onboarding & Conexão (Epic: Couple Logic)
+US01: Conexão Simples
+Como um novo usuário, Eu quero me cadastrar e enviar um link de convite único para meu parceiro(a), Para que possamos unir nossos perfis e começar a usar o app como um casal.
+
+AC1: O link de convite deve expirar em 24h.
+AC2: Quando o parceiro aceita, ambos recebem uma animação de "Match Realizado".
+US02: Perfil do Casal
+Como parte de um casal, Eu quero personalizar nosso perfil compartilhado com uma foto nossa e nossa data de aniversário, Para que o app sinta-se um espaço privado só nosso.
+
+AC1: O app deve calcular o tempo de relacionamento automaticamente.
+2. Conexão Emocional (Epic: Mood & UI)
+US03: Check-in de Humor (Daily Mood)
+Como um parceiro, Eu quero registrar como estou me sentindo hoje usando um seletor visual (estilo Claymorphism), Para que meu parceiro(a) saiba como me abordar e a IA possa sugerir o melhor "date" para o clima.
+
+AC1: O humor do parceiro não deve ser revelado antes que ambos tenham feito o check-in (evita efeito manada).
+US04: Nudges de Carinho
+Como um usuário, Eu quero receber notificações push aleatórias da IA me lembrando de algo que meu parceiro(a) gosta, Para que eu possa demonstrar carinho de forma genuína no dia a dia.
+
+3. AI Relationship Concierge (Epic: AI Concierge)
+US05: Mediação de Conflitos Assistida
+Como um parceiro com dificuldades em expressar um incômodo, Eu quero conversar privadamente com a IA para estruturar minha fala, Para que eu possa comunicar meus sentimentos de forma construtiva e sem agressividade.
+
+AC1: A IA deve atuar como mediadora neutra, sugerindo frases em primeira pessoa.
+US06: Planejador de Dates Inteligente
+Como um casal sem ideias para o final de semana, Eu quero que a IA sugira 3 opções de dates baseadas em nosso orçamento e localização no Brasil, Para que possamos sair da rotina sem estresse de planejamento.
+
+4. Monetização e App Experience (Epic: PWA & Monetization)
+US07: Upgrade para o Plano Pro (PIX)
+Como um usuário de alta intensidade, Eu quero pagar via PIX para desbloquear o Concierge de IA ilimitado instantaneamente, Para que eu não precise assinar via cartão de crédito se preferir.
+
+US08: Instalação PWA
+Como um usuário mobile, Eu quero adicionar o Sincronia à minha tela inicial, Para que eu possa abri-lo como um aplicativo nativo, sem ver barras de navegador.

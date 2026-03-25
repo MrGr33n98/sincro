@@ -1,0 +1,24 @@
+packages:
+  "framer-motion": "For fluid soft claymorphism animations and layout transitions"
+  "clsx": "For conditional classes"
+  "tailwind-merge": "For merging tailwind classes safely"
+  "lucide-react": "For crisp, modern icons"
+  "date-fns": "For elegant date formatting and dynamic greetings"
+  "react-circular-progressbar": "For the Relationship Health Score (RHS) ring"
+  "react-hook-form": "For form state management"
+
+images:
+  - path: "artifacts/sincronia/public/images/auth-bg.png"
+    description: "Abstract 3D soft pastel claymorphism shapes floating, warm cozy romantic lighting, minimal background"
+    aspect_ratio: "9:16"
+  - path: "artifacts/sincronia/public/images/dashboard-bg.png"
+    description: "Very subtle minimal pastel gradient background, light pink and peach, soft matte texture, clean"
+    aspect_ratio: "9:16"
+  - path: "artifacts/sincronia/public/images/couple-placeholder.png"
+    description: "Cute 3D claymorphism avatar of a happy couple, pastel colors, soft lighting, circular profile picture style"
+    aspect_ratio: "1:1"
+
+notes:
+  - The API uses a custom fetch wrapper but requires an Authorization header. I will add a global fetch interceptor in App.tsx to automatically inject the JWT from localStorage.
+  - The application implements a mobile-first, app-like PWA layout with a bottom navigation bar.
+  - Missing API endpoints will fail gracefully thanks to TanStack Query and standard error handling.

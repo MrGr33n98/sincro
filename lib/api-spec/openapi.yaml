@@ -3,20 +3,34 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Sincronia - Couples relationship SaaS API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: couples
+    description: Couple pairing and management
+  - name: moods
+    description: Mood tracking
+  - name: dashboard
+    description: Dashboard data
+  - name: ai
+    description: AI Concierge features
+  - name: subscriptions
+    description: Premium subscription management
+  - name: openai
+    description: OpenAI conversation operations
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,7 +38,404 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /couples/invite:
+    post:
+      operationId: createInvite
+      tags: [couples]
+      summary: Create couple invite link
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Invite created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InviteResponse"
+
+  /couples/join:
+    post:
+      operationId: joinCouple
+      tags: [couples]
+      summary: Join couple via invite token
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinCoupleBody"
+      responses:
+        "200":
+          description: Joined couple successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoupleProfile"
+        "400":
+          description: Invalid or expired invite
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /couples/profile:
+    get:
+      operationId: getCoupleProfile
+      tags: [couples]
+      summary: Get couple profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Couple profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoupleProfile"
+    patch:
+      operationId: updateCoupleProfile
+      tags: [couples]
+      summary: Update couple profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCoupleProfileBody"
+      responses:
+        "200":
+          description: Updated couple profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoupleProfile"
+
+  /moods:
+    post:
+      operationId: checkInMood
+      tags: [moods]
+      summary: Submit daily mood check-in
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MoodCheckInBody"
+      responses:
+        "201":
+          description: Mood recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MoodEntry"
+    get:
+      operationId: getMoodHistory
+      tags: [moods]
+      summary: Get mood history for the couple
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: Mood history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MoodEntry"
+
+  /moods/today:
+    get:
+      operationId: getTodayMoods
+      tags: [moods]
+      summary: Get today's mood sync for both partners
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Today's mood sync
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MoodSync"
+
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get full dashboard data
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardData"
+
+  /ai/date-suggestions:
+    post:
+      operationId: generateDateSuggestions
+      tags: [ai]
+      summary: Generate AI date suggestions
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DateSuggestionsBody"
+      responses:
+        "200":
+          description: Date suggestions generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DateSuggestionsResponse"
+
+  /ai/mediation:
+    post:
+      operationId: startMediation
+      tags: [ai]
+      summary: Start conflict mediation session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MediationBody"
+      responses:
+        "200":
+          description: Mediation response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediationResponse"
+
+  /ai/rhs:
+    get:
+      operationId: getRelationshipHealthScore
+      tags: [ai]
+      summary: Get Relationship Health Score
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: RHS data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RHSData"
+
+  /subscriptions/status:
+    get:
+      operationId: getSubscriptionStatus
+      tags: [subscriptions]
+      summary: Get subscription status
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Subscription status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionStatus"
+
+  /subscriptions/upgrade:
+    post:
+      operationId: upgradeToPro
+      tags: [subscriptions]
+      summary: Initiate PIX payment for Pro upgrade
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpgradeBody"
+      responses:
+        "200":
+          description: PIX payment initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PixPaymentResponse"
+
+  /openai/conversations:
+    get:
+      operationId: listOpenaiConversations
+      tags: [openai]
+      summary: List conversations
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenaiConversation"
+    post:
+      operationId: createOpenaiConversation
+      tags: [openai]
+      summary: Create conversation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOpenaiConversationBody"
+      responses:
+        "201":
+          description: Conversation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversation"
+
+  /openai/conversations/{id}:
+    get:
+      operationId: getOpenaiConversation
+      tags: [openai]
+      summary: Get conversation with messages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversationWithMessages"
+
+  /openai/conversations/{id}/messages:
+    post:
+      operationId: sendOpenaiMessage
+      tags: [openai]
+      summary: Send message (SSE stream)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendOpenaiMessageBody"
+      responses:
+        "200":
+          description: SSE stream of assistant response
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +445,540 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+
+    RegisterBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+      required:
+        - name
+        - email
+        - password
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserProfile"
+      required:
+        - token
+        - user
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        coupleId:
+          type: integer
+          nullable: true
+        isPro:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - isPro
+        - createdAt
+
+    InviteResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        inviteUrl:
+          type: string
+      required:
+        - token
+        - expiresAt
+        - inviteUrl
+
+    JoinCoupleBody:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+
+    CoupleProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user1:
+          $ref: "#/components/schemas/PartnerInfo"
+        user2:
+          $ref: "#/components/schemas/PartnerInfo"
+        anniversaryDate:
+          type: string
+          format: date
+          nullable: true
+        relationshipDays:
+          type: integer
+        coverPhotoUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - user1
+        - user2
+        - relationshipDays
+        - createdAt
+
+    PartnerInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+      required:
+        - id
+        - name
+
+    UpdateCoupleProfileBody:
+      type: object
+      properties:
+        anniversaryDate:
+          type: string
+          format: date
+        coverPhotoUrl:
+          type: string
+
+    MoodCheckInBody:
+      type: object
+      properties:
+        mood:
+          type: string
+          enum:
+            - happy
+            - excited
+            - calm
+            - focused
+            - tired
+            - stressed
+            - sad
+            - anxious
+            - romantic
+            - playful
+        note:
+          type: string
+          nullable: true
+      required:
+        - mood
+
+    MoodEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        userName:
+          type: string
+        mood:
+          type: string
+        note:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - userName
+        - mood
+        - createdAt
+
+    MoodSync:
+      type: object
+      properties:
+        user1:
+          $ref: "#/components/schemas/MoodEntry"
+          nullable: true
+        user2:
+          $ref: "#/components/schemas/MoodEntry"
+          nullable: true
+        bothCheckedIn:
+          type: boolean
+        aiInsight:
+          type: string
+          nullable: true
+      required:
+        - bothCheckedIn
+
+    DashboardData:
+      type: object
+      properties:
+        coupleId:
+          type: integer
+        rhsScore:
+          $ref: "#/components/schemas/RHSData"
+        moodSync:
+          $ref: "#/components/schemas/MoodSync"
+        aiConcierge:
+          $ref: "#/components/schemas/AIConciergeData"
+        stats:
+          $ref: "#/components/schemas/CoupleStats"
+        isPro:
+          type: boolean
+      required:
+        - coupleId
+        - rhsScore
+        - moodSync
+        - aiConcierge
+        - stats
+        - isPro
+
+    RHSData:
+      type: object
+      properties:
+        current:
+          type: integer
+          minimum: 0
+          maximum: 100
+        trend:
+          type: string
+          enum: [up, down, stable]
+        variation:
+          type: integer
+        breakdown:
+          $ref: "#/components/schemas/RHSBreakdown"
+      required:
+        - current
+        - trend
+        - variation
+
+    RHSBreakdown:
+      type: object
+      properties:
+        communication:
+          type: integer
+        moodConsistency:
+          type: integer
+        qualityTime:
+          type: integer
+        streak:
+          type: integer
+      required:
+        - communication
+        - moodConsistency
+        - qualityTime
+        - streak
+
+    AIConciergeData:
+      type: object
+      properties:
+        nextDate:
+          $ref: "#/components/schemas/DateEvent"
+          nullable: true
+        suggestion:
+          $ref: "#/components/schemas/DateSuggestion"
+          nullable: true
+      required: []
+
+    DateEvent:
+      type: object
+      properties:
+        title:
+          type: string
+        scheduledAt:
+          type: string
+          format: date-time
+        location:
+          type: string
+          nullable: true
+      required:
+        - title
+        - scheduledAt
+
+    DateSuggestion:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [outdoor, indoor, cultural, gastronomic, adventure, romantic]
+        effortLevel:
+          type: string
+          enum: [low, medium, high]
+        estimatedCost:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+      required:
+        - title
+        - description
+        - type
+        - effortLevel
+
+    CoupleStats:
+      type: object
+      properties:
+        streakDays:
+          type: integer
+        communicationLevel:
+          type: string
+          enum: [low, medium, high]
+        unresolvedConflicts:
+          type: integer
+        weeklyQualityHours:
+          type: number
+      required:
+        - streakDays
+        - communicationLevel
+        - unresolvedConflicts
+        - weeklyQualityHours
+
+    DateSuggestionsBody:
+      type: object
+      properties:
+        budget:
+          type: string
+          enum: [free, low, medium, high]
+        city:
+          type: string
+        preferences:
+          type: array
+          items:
+            type: string
+        count:
+          type: integer
+          default: 3
+      required:
+        - budget
+        - city
+
+    DateSuggestionsResponse:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DateSuggestion"
+      required:
+        - suggestions
+
+    MediationBody:
+      type: object
+      properties:
+        concern:
+          type: string
+        context:
+          type: string
+          nullable: true
+      required:
+        - concern
+
+    MediationResponse:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            type: string
+        reframedMessage:
+          type: string
+        tone:
+          type: string
+        tips:
+          type: array
+          items:
+            type: string
+      required:
+        - suggestions
+        - reframedMessage
+        - tone
+        - tips
+
+    SubscriptionStatus:
+      type: object
+      properties:
+        isPro:
+          type: boolean
+        plan:
+          type: string
+          enum: [free, pro]
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        features:
+          type: array
+          items:
+            type: string
+      required:
+        - isPro
+        - plan
+        - features
+
+    UpgradeBody:
+      type: object
+      properties:
+        plan:
+          type: string
+          enum: [monthly, annual]
+      required:
+        - plan
+
+    PixPaymentResponse:
+      type: object
+      properties:
+        pixCode:
+          type: string
+        pixQrCode:
+          type: string
+        amount:
+          type: number
+        expiresAt:
+          type: string
+          format: date-time
+        paymentId:
+          type: string
+      required:
+        - pixCode
+        - pixQrCode
+        - amount
+        - expiresAt
+        - paymentId
+
+    OpenaiConversation:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+          nullable: true
+        context:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+        - updatedAt
+
+    OpenaiConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+          nullable: true
+        context:
+          type: string
+          nullable: true
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenaiMessage"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - messages
+        - createdAt
+        - updatedAt
+
+    OpenaiMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - role
+        - content
+        - createdAt
+
+    CreateOpenaiConversationBody:
+      type: object
+      properties:
+        title:
+          type: string
+        context:
+          type: string
+      required: []
+
+    SendOpenaiMessageBody:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content

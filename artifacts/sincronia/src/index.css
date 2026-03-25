@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme inline {
+  --font-display: 'Fredoka', sans-serif;
+  --font-sans: 'Nunito', sans-serif;
+
+  --color-background: hsl(350 40% 98%);
+  --color-foreground: hsl(350 30% 25%);
+  
+  --color-primary: hsl(340 80% 75%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  
+  --color-secondary: hsl(260 60% 84%);
+  --color-secondary-foreground: hsl(260 40% 25%);
+  
+  --color-accent: hsl(20 90% 80%);
+  --color-accent-foreground: hsl(20 50% 25%);
+
+  --color-muted: hsl(350 20% 94%);
+  --color-muted-foreground: hsl(350 15% 55%);
+
+  --color-card: hsl(350 40% 97%);
+  --color-card-foreground: hsl(350 30% 25%);
+
+  --color-border: hsl(350 30% 90%);
+  --color-ring: hsl(340 80% 75%);
+  --color-destructive: hsl(0 84% 68%);
+
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+}
+
+:root {
+  --background: 350 40% 98%;
+  --foreground: 350 30% 25%;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased font-sans overflow-x-hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer utilities {
+  /* Claymorphism Base Card */
+  .clay-card {
+    @apply bg-card rounded-[2rem];
+    box-shadow: 
+      12px 12px 24px rgba(210, 190, 195, 0.4),
+      -12px -12px 24px rgba(255, 255, 255, 0.9),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+      inset -2px -2px 4px rgba(210, 190, 195, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .clay-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      16px 16px 30px rgba(210, 190, 195, 0.35),
+      -16px -16px 30px rgba(255, 255, 255, 0.95),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+      inset -2px -2px 4px rgba(210, 190, 195, 0.15);
+  }
+
+  /* Claymorphism Button - Primary */
+  .clay-btn-primary {
+    @apply bg-primary text-primary-foreground font-display font-semibold rounded-full px-6 py-3;
+    box-shadow: 
+      6px 6px 14px rgba(230, 120, 140, 0.4),
+      -6px -6px 14px rgba(255, 255, 255, 0.8),
+      inset 2px 2px 6px rgba(255, 255, 255, 0.5),
+      inset -2px -2px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .clay-btn-primary:active {
+    transform: scale(0.96);
+    box-shadow: 
+      inset 4px 4px 8px rgba(0, 0, 0, 0.15),
+      inset -4px -4px 8px rgba(255, 255, 255, 0.6);
+  }
+
+  .clay-btn-primary:disabled {
+    @apply opacity-60 pointer-events-none;
+  }
+
+  /* Claymorphism Button - Secondary */
+  .clay-btn-secondary {
+    @apply bg-secondary text-secondary-foreground font-display font-semibold rounded-full px-6 py-3;
+    box-shadow: 
+      6px 6px 14px rgba(180, 170, 220, 0.4),
+      -6px -6px 14px rgba(255, 255, 255, 0.8),
+      inset 2px 2px 6px rgba(255, 255, 255, 0.5),
+      inset -2px -2px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .clay-btn-secondary:active {
+    transform: scale(0.96);
+    box-shadow: 
+      inset 4px 4px 8px rgba(0, 0, 0, 0.1),
+      inset -4px -4px 8px rgba(255, 255, 255, 0.6);
+  }
+
+  /* Claymorphism Input */
+  .clay-input {
+    @apply w-full bg-background rounded-2xl px-5 py-4 text-foreground outline-none;
+    box-shadow: 
+      inset 4px 4px 8px rgba(210, 190, 195, 0.3),
+      inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .clay-input:focus {
+    @apply border-primary/30;
+    box-shadow: 
+      inset 6px 6px 10px rgba(210, 190, 195, 0.4),
+      inset -6px -6px 10px rgba(255, 255, 255, 0.9),
+      0 0 0 4px rgba(249, 168, 212, 0.2);
+  }
+
+  /* Hide scrollbar for clean UI */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

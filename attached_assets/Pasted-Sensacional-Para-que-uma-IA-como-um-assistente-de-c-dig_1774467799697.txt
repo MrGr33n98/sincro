@@ -1,0 +1,76 @@
+Sensacional! Para que uma IA (como um assistente de código no Cursor, Copilot ou até mesmo eu em outro prompt) consiga gerar o código perfeito em Next.js 14 com Tailwind CSS e a estética Claymorphism, precisamos de uma **Especificação de Componentes (Specs)** detalhada. 
+
+Como você está montando uma arquitetura robusta (Rails API + Next.js), o ideal é dividir o dashboard em **Widgets Independentes** (Client e Server Components).
+
+Aqui está o "Raio-X" completo do Dashboard do Casal para você passar para a IA programar:
+
+### 1. Header & Status Global (Server Component)
+A primeira coisa que o casal vê ao abrir o PWA. Precisa ser acolhedor e direto.
+* **Saudação Dinâmica:** Baseada na hora do dia e no humor atual. (Ex: "Boa noite, Felipe. O clima hoje está tranquilo.")
+* **Relationship Health Score (RHS):** Um círculo (estilo anel do Apple Watch, mas com Claymorphism) mostrando o score atual (ex: 85/100).
+* **Indicador de Tendência:** Uma pequena badge flutuante indicando a variação semanal (ex: `+5 pts essa semana 🚀`).
+* **Menu de Configurações:** Ícone discreto para acessar perfil, preferências de notificações (Firebase/OneSignal) e gating premium.
+
+### 2. Widget de Sincronia de Humor (Client Component)
+A área mais interativa e visual.
+* **Avatares Conectados:** Dois cards ou bolhas com os avatares (Ex: Felipe e Lari).
+* **Status de Humor Atual:** O humor selecionado no dia (ex: Felipe: "Focado ⚡", Lari: "Cansada 🔋").
+* **Botão "Atualizar Meu Humor":** Um CTA rápido para abrir o modal de check-in sem sair da tela.
+* **Frase de Conexão (IA):** Uma micro-copy gerada pelo assistente lendo os dois humores. (Ex: *"Momento de recarregar as energias juntos hoje."*)
+
+### 3. AI Concierge & Quality Time (Server Component + IA Loading State)
+Onde a mágica da OpenAI/Claude acontece.
+* **Próximo Date (Card de Destaque):** Se houver um encontro agendado, mostra o contador, local e data.
+* **Sugestão de IA (Geo-BR):** Se não houver date planejado, a IA exibe uma sugestão contextualizada. 
+    * *Exemplo visualizado no card:* "Que tal um pôr do sol em Santo Antônio de Lisboa nesta sexta? 🌅 [Aceitar] [Gerar Outra]"
+* **Barra de Progresso da Meta:** Exibição da meta do mês definida no Onboarding (ex: "Novidade: 1/2 Dates Fora da Rotina realizados").
+
+### 4. Grid de Estatísticas Rápidas (Client Component)
+Cards menores (estilo bento-grid) para métricas de engajamento, perfeitos para a UI Claymorphism.
+* **Card 1: Connection Streak:** Número em destaque com um ícone de fogo (ex: `12 Dias Seguidos`).
+* **Card 2: Termômetro de Comunicação:** Nível baseado na troca de interações e uso do app (ex: `Alta 🟢`).
+* **Card 3: Tempo de Qualidade:** Horas investidas no relacionamento na semana.
+
+### 5. Zona Segura / Mediação de Conflitos (Floating Action Button ou Card Fixo)
+* **Botão "Precisamos Conversar":** Um botão visualmente diferente (talvez em tons pastéis de alerta, não vermelho agressivo) que aciona o **Assistente de Mediação de Conflitos (ID 10)**.
+* **Status de Conflitos:** Um texto super discreto, como "Nenhuma pendência" ou "1 conversa em andamento".
+
+---
+
+### 📦 O Payload (Contrato JSON entre seu Rails 7 e Next.js)
+
+Para a IA gerar o Frontend corretamente, ela precisa saber como os dados vão chegar. O seu `GET /api/v1/dashboard` deve entregar algo assim:
+
+```json
+{
+  "couple_id": "cpl_98765",
+  "rhs_score": {
+    "current": 88,
+    "trend": "up",
+    "variation": 5
+  },
+  "mood_sync": {
+    "user_1": { "name": "Felipe", "mood": "focused", "updated_at": "2026-03-25T14:00:00Z" },
+    "user_2": { "name": "Lari", "mood": "tired", "updated_at": "2026-03-25T10:30:00Z" },
+    "ai_insight": "Um jantar leve em casa pode ser a melhor pedida para hoje."
+  },
+  "ai_concierge": {
+    "next_date": null,
+    "suggestion": {
+      "title": "Pôr do sol em Santo Antônio de Lisboa",
+      "type": "outdoor",
+      "effort_level": "low"
+    }
+  },
+  "stats": {
+    "streak_days": 12,
+    "communication_level": "high",
+    "unresolved_conflicts": 0
+  }
+}
+```
+
+---
+
+### 🚀 Quer que eu gere o código do layout agora?
+Se quiser, eu posso criar o código **React (Next.js 14) com Tailwind CSS** para essa tela inteira agora mesmo, já aplicando as classes base para o efeito *Claymorphism* (sombras duplas, bordas arredondadas, fundos translúcidos). Quer que eu mande o código do componente principal?
