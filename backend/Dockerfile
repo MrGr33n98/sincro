@@ -1,20 +1,22 @@
-FROM ruby:3.2.2
+FROM ruby:3.2.2-slim
 
-# Install dependencies
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs
+# Dependências do sistema
+RUN apt-get update -qq && apt-get install -y \
+  build-essential \
+  libpq-dev \
+  curl \
+  && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Install gems
-COPY Gemfile Gemfile.lock ./
-RUN bundle install
+# Instalar apenas gems de produção (sem test/development)
+COPY Gemfile ./
+RUN bundle config set --local without 'development test' \
+  && bundle install --jobs 4 --retry 3
 
-# Copy the Rails application
+# Copiar o restante da aplicação
 COPY . .
 
-# Expose port 3001 for the Rails API
 EXPOSE 3001
 
-# Start the Rails server
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0", "-p", "3001"]
