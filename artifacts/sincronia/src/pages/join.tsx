@@ -14,7 +14,7 @@ export default function Join() {
     if (params?.token) {
       joinMut.mutate({ data: { token: params.token } }, {
         onSuccess: () => {
-          setTimeout(() => setLocation("/"), 2000);
+          setTimeout(() => setLocation("/app"), 2000);
         }
       });
     }
