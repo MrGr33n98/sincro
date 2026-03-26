@@ -21,15 +21,39 @@ pnpm workspace monorepo using TypeScript. Sincronia — a couples relationship S
 ## Project: Sincronia
 
 Sincronia is a couples relationship SaaS PWA for the Brazilian market. Key features:
-- JWT authentication (register/login)
-- Couple invitation & pairing system (invite link, 24h expiry, match animation)
-- Daily mood check-in with 10 moods (Claymorphism UI)
-- Shared couple dashboard with Relationship Health Score ring
-- AI date suggestions (GPT-5.2, localized for Brazil)
-- Conflict mediation assistant (CNV-based, 1st person reframing)
-- AI chat (SSE streaming)
+- JWT authentication (register/login) — `felipe@test.com` / `123456` & `lari@test.com` / `123456`
+- Couple invitation & pairing system (invite link, 24h countdown, match animation)
+- Daily mood check-in with 10 moods — blind reveal (partner mood shown only when both check in)
+- Shared couple dashboard with Relationship Health Score ring + breakdown
+- AI date suggestions (GPT-5.2, localized for Brazil) + share button
+- Conflict mediation assistant (CNV-based, 1st person reframing, copy button)
+- AI chat (SSE streaming, quick prompts, new chat button)
+- Couple profile with RHS breakdown bars, streak, logout
 - Premium gating + PIX payment simulation
+- Marketing landing page at `/` (hero, features, how-it-works, testimonials, pricing, CTA)
 - PWA-ready
+
+## Routing
+
+- `/` → Landing page (public, no auth required)
+- `/login` → Login
+- `/register` → Register
+- `/invite` → Invite partner (requires auth, no coupleId)
+- `/join/:token` → Accept invite
+- `/app` → Dashboard (requires auth + coupleId)
+- `/mood` → Mood check-in
+- `/ai` → AI Hub
+- `/ai/dates` → Date suggestions
+- `/ai/mediation` → Conflict mediation
+- `/ai/chat` → AI chat (SSE streaming)
+- `/couple` → Couple profile
+- `/upgrade` → Upgrade to Pro (PIX)
+
+## Auth Notes
+
+- JWT token stored in localStorage as `sincronia_token`
+- `setAuthTokenGetter()` from `@workspace/api-client-react` injects token into all API requests
+- AppLayout guards: public routes skip auth check; unauthenticated users → `/login`; authenticated without coupleId → `/invite`
 
 ## Structure
 
