@@ -92,8 +92,8 @@ end
 # TEST
 group :test do
   gem 'capybara', '~> 3.40'
-  gem 'selenium-webdriver', '~> 4.21'
-  gem 'webdrivers', '~> 5.3'
+  gem 'selenium-webdriver'
+  gem 'webdrivers'
   gem 'simplecov', '~> 0.22', require: false
   gem 'simplecov-console', require: false
   gem 'factory_bot_rails', '~> 6.4'
