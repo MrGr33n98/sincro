@@ -10,8 +10,8 @@ WORKDIR /app
 COPY pnpm-workspace.yaml pnpm-lock.yaml* package.json ./
 
 # Copia o projeto específico e a lib dependente
+COPY lib ./lib
 COPY artifacts/sincronia/package.json ./artifacts/sincronia/
-COPY lib/api-client-react ./lib/api-client-react
 
 # Instala as dependências usando pnpm (resolve os catálogos)
 RUN pnpm install --frozen-lockfile --filter "@workspace/sincronia..." || pnpm install --filter "@workspace/sincronia..."
