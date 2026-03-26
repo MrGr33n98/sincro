@@ -41,7 +41,12 @@ jobs:
           # JWT
           JWT_SECRET=${{ secrets.JWT_SECRET }}
 
-          # FRONTEND
+          # FRONTEND (Vite)
+          VITE_API_URL=http://${{ secrets.EC2_HOST }}:3001
+          VITE_API_BASE_URL=http://${{ secrets.EC2_HOST }}:3001
+          VITE_SITE_URL=http://${{ secrets.EC2_HOST }}:3000
+
+          # FRONTEND (Next.js - se houver)
           NEXT_PUBLIC_API_URL=http://${{ secrets.EC2_HOST }}:3001
           NEXT_PUBLIC_API_BASE_URL=http://${{ secrets.EC2_HOST }}:3001
           NEXT_PUBLIC_SITE_URL=http://${{ secrets.EC2_HOST }}:3000

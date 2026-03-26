@@ -7,7 +7,7 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 # Copia arquivos globais do workspace
-COPY pnpm-workspace.yaml pnpm-lock.yaml* package.json ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml* package.json .env ./
 
 # Copia o projeto específico e a lib dependente
 COPY lib ./lib
