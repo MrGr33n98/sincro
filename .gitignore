@@ -47,3 +47,13 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Segurança — NUNCA commitar
+.env
+*.pem
+*.key
+*.p12
+
+# Logs do backend Rails
+backend/log/*.log
+backend/tmp/

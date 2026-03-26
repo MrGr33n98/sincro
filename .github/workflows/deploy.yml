@@ -1,0 +1,142 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch: # permite rodar manualmente pelo GitHub UI
+
+env:
+  REMOTE_DIR: /home/ubuntu/couple-sync
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # ── 2. Criar .env de produção a partir dos secrets ─────────────
+      - name: Gerar .env de produção
+        run: |
+          cat <<EOF > .env
+          # DATABASE
+          POSTGRES_USER=postgres
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=sincronia_production
+          POSTGRES_HOST=sincronia-postgres
+
+          # REDIS
+          REDIS_URL=redis://sincronia-redis:6379/1
+
+          # RAILS
+          RAILS_ENV=production
+          RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }}
+          SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}
+          RAILS_LOG_TO_STDOUT=true
+
+          # JWT
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+
+          # FRONTEND
+          NEXT_PUBLIC_API_URL=http://${{ secrets.EC2_HOST }}:3001
+          NEXT_PUBLIC_API_BASE_URL=http://${{ secrets.EC2_HOST }}:3001
+          NEXT_PUBLIC_SITE_URL=http://${{ secrets.EC2_HOST }}:3000
+          BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}
+          NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+
+          # STORAGE
+          SPACES_ACCESS_KEY_ID=${{ secrets.SPACES_ACCESS_KEY_ID }}
+          SPACES_SECRET_ACCESS_KEY=${{ secrets.SPACES_SECRET_ACCESS_KEY }}
+          SPACES_REGION=nyc3
+          SPACES_BUCKET=sincronia-dev
+          SPACES_ENDPOINT=https://nyc3.digitaloceanspaces.com
+
+          # AUTENTICAÇÃO SOCIAL
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+
+          # PAGAMENTOS
+          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_PUBLISHABLE_KEY=${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+
+          # EMAIL
+          SMTP_HOST=smtp.gmail.com
+          SMTP_PORT=587
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM=noreply@sincronia.app
+          EOF
+
+      # ── 3. Copiar arquivos para a EC2 via rsync ────────────────────
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Sincronizar código para EC2
+        run: |
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='backend/tmp' \
+            --exclude='backend/log' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            ./ ubuntu@${{ secrets.EC2_HOST }}:${{ env.REMOTE_DIR }}/
+
+      # ── 4. Deploy via SSH ──────────────────────────────────────────
+      - name: Deploy — Build e subir containers
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          timeout: 600s
+          script: |
+            set -e
+            cd ${{ env.REMOTE_DIR }}
+
+            echo "==> Parando containers antigos..."
+            sudo docker compose down --remove-orphans || true
+
+            echo "==> Limpando cache Docker..."
+            sudo docker system prune -f || true
+
+            echo "==> Build das imagens..."
+            sudo docker compose build --no-cache
+
+            echo "==> Subindo todos os serviços..."
+            sudo docker compose up -d
+
+            echo "==> Aguardando backend ficar saudável (até 3min)..."
+            timeout 180 bash -c 'until sudo docker compose exec -T backend curl -sf http://localhost:3001/health/liveness; do sleep 5; done' || true
+
+            echo "==> Status final:"
+            sudo docker compose ps
+
+            echo ""
+            echo "✅ Deploy concluído!"
+            echo "   Frontend: http://${{ secrets.EC2_HOST }}:3000"
+            echo "   Backend:  http://${{ secrets.EC2_HOST }}:3001"
+
+      # ── 5. Notificação de status ───────────────────────────────────
+      - name: Notificar sucesso
+        if: success()
+        run: |
+          echo "🚀 Deploy realizado com sucesso!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Autor:  ${{ github.actor }}"
+
+      - name: Notificar falha
+        if: failure()
+        run: |
+          echo "❌ Deploy FALHOU no commit ${{ github.sha }}"
+          echo "Verifique os logs acima para detalhes."
