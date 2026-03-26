@@ -114,6 +114,60 @@ Responda APENAS com JSON válido:
   }
 });
 
+router.post("/love-letter", requireAuth, async (req, res) => {
+  const user = (req as any).user;
+  const { partnerName, feelings, memories: mem, tone = "romantic" } = req.body;
+
+  if (!feelings?.trim()) {
+    res.status(400).json({ error: "missing_fields" });
+    return;
+  }
+
+  const toneMap: Record<string, string> = {
+    romantic: "romântico e apaixonado",
+    playful: "divertido e carinhoso",
+    nostalgic: "nostálgico e sentimental",
+    passionate: "intenso e apaixonado",
+  };
+
+  const prompt = `Você é um escritor especializado em cartas de amor para casais brasileiros.
+
+Escreva uma carta de amor pessoal e genuína com as seguintes informações:
+- Nome do parceiro(a): ${partnerName || "Meu amor"}
+- Sentimentos que o remetente quer expressar: "${feelings}"
+${mem ? `- Memórias especiais a mencionar: "${mem}"` : ""}
+- Tom desejado: ${toneMap[tone] || "romântico"}
+
+A carta deve:
+1. Começar com uma saudação carinhosa personalizada
+2. Ter 3-4 parágrafos fluidos e emocionantes
+3. Usar linguagem brasileira natural e calorosa
+4. Terminar com uma declaração poderosa
+5. Ser autêntica, não genérica
+
+Responda APENAS com JSON:
+{
+  "letter": "O texto completo da carta aqui",
+  "subject": "Uma linha de assunto poética para a carta"
+}`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-5.2",
+      max_completion_tokens: 8192,
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+    });
+
+    const content = response.choices[0]?.message?.content ?? "{}";
+    const result = JSON.parse(content);
+    res.json(result);
+  } catch (err) {
+    req.log.error({ err }, "AI love letter error");
+    res.status(500).json({ error: "ai_error" });
+  }
+});
+
 router.get("/rhs", requireAuth, async (req, res) => {
   const user = (req as any).user;
   res.json({
