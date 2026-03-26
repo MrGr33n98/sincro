@@ -53,6 +53,7 @@ Thumbs.db
 *.pem
 *.key
 *.p12
+SECRETS.md
 
 # Logs do backend Rails
 backend/log/*.log
