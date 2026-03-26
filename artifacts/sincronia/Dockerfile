@@ -1,5 +1,8 @@
 # --- Estágio de Build ---
-FROM node:18-alpine AS build
+FROM node:22-alpine AS build
+
+# Instala dependências nativas comuns para Alpine
+RUN apk add --no-cache libc6-compat g++ make python3
 
 # Instala pnpm
 RUN npm install -g pnpm
@@ -7,7 +10,7 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 # Copia arquivos globais do workspace
-COPY pnpm-workspace.yaml pnpm-lock.yaml* package.json .env ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml* package.json .env tsconfig*.json ./
 
 # Copia TODAS as bibliotecas (lib/) pois o workspace depende de múltiplas libs
 COPY lib ./lib
@@ -24,7 +27,7 @@ WORKDIR /app/artifacts/sincronia
 RUN pnpm run build
 
 # --- Estágio de Produção ---
-FROM node:18-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
