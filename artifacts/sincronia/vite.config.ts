@@ -5,27 +5,24 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { VitePWA } from "vite-plugin-pwa";
 
+// PORT: Required only for dev server, use default for build
 const rawPort = process.env.PORT;
+const isCI = process.env.CI === "true";
+const isProduction = process.env.NODE_ENV === "production";
 
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
+// Use default port for CI/build, require PORT only for local dev
+const port = rawPort ? Number(rawPort) : (isCI || isProduction ? 3000 : 5173);
+
+if (!rawPort && !isCI && !isProduction) {
+  console.warn("[Vite] PORT not set, using default for development");
 }
-
-const port = Number(rawPort);
 
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH;
-
-if (!basePath) {
-  throw new Error(
-    "BASE_PATH environment variable is required but was not provided.",
-  );
-}
+// BASE_PATH: Optional, defaults to "/"
+const basePath = process.env.BASE_PATH || "/";
 
 export default defineConfig({
   base: basePath,
