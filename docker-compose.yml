@@ -117,9 +117,8 @@ services:
   # ─────────────────────────────────────────────────────────────────
   frontend:
     build:
-      context: ./artifacts/sincronia
-      dockerfile: Dockerfile
-
+      context: .
+      dockerfile: artifacts/sincronia/Dockerfile
     container_name: sincronia-frontend
     restart: unless-stopped
     depends_on:
