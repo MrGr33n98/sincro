@@ -1,3 +1,7 @@
+# ═══════════════════════════════════════════════════════════════════
+# Sincronia Frontend — Dockerfile (React + Vite)
+# ═══════════════════════════════════════════════════════════════════
+
 # --- Estágio de Build ---
 FROM node:22-alpine AS build
 
@@ -9,19 +13,19 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
-# Copia arquivos relevantes do frontend
-COPY package.json tsconfig*.json vite.config.ts ./
+# Copia arquivos do frontend
+COPY package.json pnpm-lock.yaml* ./
 
-# Tenta copiar dependências do workspace se estiverem no build context
-# IMPORTANTE: Se o build context for restrito, você precisará instalar apenas
-# as dependências deste subprojeto ou alterar o build context no compose.
+# Instala dependências
+RUN pnpm install --frozen-lockfile || pnpm install
+
+# Copia código fonte
 COPY src ./src
 COPY public ./public
-COPY index.html ./
+COPY index.html vite.config.ts tsconfig.json ./
 
 # Build da aplicação Vite
-RUN npm install
-RUN npm run build
+RUN pnpm run build
 
 # --- Estágio de Produção ---
 FROM node:22-alpine
@@ -31,7 +35,7 @@ WORKDIR /app
 # Instala um servidor estático simples
 RUN npm install -g serve
 
-# Copia apenas os arquivos do build (aqui é /app/dist já que no WORKDIR /app acima nós rodamos npm run build)
+# Copia apenas os arquivos do build
 COPY --from=build /app/dist ./dist
 
 EXPOSE 3000
