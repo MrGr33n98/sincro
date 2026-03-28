@@ -115,12 +115,38 @@ frontend:
 
 ---
 
+## Problema 6: PORT exigida no build do frontend ✅ RESOLVIDO
+
+**Erro:** `Error: PORT environment variable is required but was not provided.`
+
+**Causa:** O `vite.config.ts` exigia PORT e BASE_PATH mesmo durante o build em CI.
+
+### Solução
+Tornar PORT e BASE_PATH opcionais durante o build:
+
+```typescript
+// Antes (exigia sempre)
+const rawPort = process.env.PORT;
+if (!rawPort) {
+  throw new Error("PORT environment variable is required...");
+}
+
+// Depois (usa defaults em CI/production)
+const isCI = process.env.CI === "true";
+const isProduction = process.env.NODE_ENV === "production";
+const port = rawPort ? Number(rawPort) : (isCI || isProduction ? 3000 : 5173);
+const basePath = process.env.BASE_PATH || "/";
+```
+
+---
+
 ## Arquivos Modificados
 
 1. `backend/Dockerfile` — Corrigidos os caminhos COPY + removido assets:precompile
 2. `backend/Gemfile.lock` — Atualizado com todas as gems
 3. `artifacts/sincronia/Dockerfile` — Usa contexto da raiz (workspace monorepo)
 4. `docker-compose.yml` — Frontend context alterado para `.`
+5. `artifacts/sincronia/vite.config.ts` — PORT e BASE_PATH opcionais em CI
 
 ---
 
