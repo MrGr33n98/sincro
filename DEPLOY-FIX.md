@@ -82,15 +82,36 @@ COPY artifacts/sincronia ./artifacts/sincronia
 COPY pnpm-workspace.yaml ./
 ```
 
-### Depois (Correto - Standalone)
+### Depois (Correto - Workspace Monorepo)
 ```dockerfile
-COPY package.json pnpm-lock.yaml* ./
-COPY src ./src
-COPY public ./public
-COPY index.html vite.config.ts tsconfig.json ./
+# Dockerfile agora usa contexto da raiz
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY artifacts/sincronia/package.json ./artifacts/sincronia/
+RUN pnpm install --filter "@workspace/sincronia..." --no-frozen-lockfile
 ```
 
-**Explicação:** O frontend agora faz build standalone, sem depender do workspace monorepo.
+**Explicação:** O frontend agora faz build a partir da raiz do projeto para acessar o `pnpm-lock.yaml` e as dependências do workspace.
+
+**docker-compose.yml atualizado:**
+```yaml
+frontend:
+  build:
+    context: .              # Raiz do projeto
+    dockerfile: artifacts/sincronia/Dockerfile
+```
+
+---
+
+## Problema 5: Frontend pnpm-lock.yaml ausente ✅ RESOLVIDO
+
+**Erro:** `ERR_PNPM_NO_LOCKFILE Cannot install with "frozen-lockfile" because pnpm-lock.yaml is absent`
+
+**Causa:** O `pnpm-lock.yaml` está na raiz do projeto, mas o contexto de build era `./artifacts/sincronia`.
+
+### Solução
+1. Dockerfile do frontend agora usa o contexto da raiz (`.`)
+2. docker-compose.yml atualizado para usar contexto da raiz
+3. Build instala dependências com `--no-frozen-lockfile`
 
 ---
 
@@ -98,7 +119,8 @@ COPY index.html vite.config.ts tsconfig.json ./
 
 1. `backend/Dockerfile` — Corrigidos os caminhos COPY + removido assets:precompile
 2. `backend/Gemfile.lock` — Atualizado com todas as gems
-3. `artifacts/sincronia/Dockerfile` — Simplificado para build standalone
+3. `artifacts/sincronia/Dockerfile` — Usa contexto da raiz (workspace monorepo)
+4. `docker-compose.yml` — Frontend context alterado para `.`
 
 ---
 
@@ -120,17 +142,19 @@ docker-compose logs -f
 sincronia/
 ├── docker-compose.yml
 │   ├── backend: context: ./backend
-│   └── frontend: context: ./artifacts/sincronia
+│   └── frontend: context: . (raiz)
+├── pnpm-workspace.yaml       # Workspace config
+├── pnpm-lock.yaml            # Lockfile do workspace
 ├── backend/
-│   ├── Dockerfile              # COPY Gemfile ... (não COPY backend/Gemfile)
+│   ├── Dockerfile            # COPY Gemfile ... (context: ./backend)
 │   ├── Gemfile
-│   ├── Gemfile.lock            # SEMPRE atualizar após mudar Gemfile
+│   ├── Gemfile.lock
 │   └── app/
 └── artifacts/sincronia/
-    ├── Dockerfile              # COPY package.json ... (standalone)
+    ├── Dockerfile            # COPY da raiz (context: .)
     ├── package.json
     ├── src/
-    └── dist/                   # Build output
+    └── dist/                 # Build output
 ```
 
 ---
@@ -141,9 +165,11 @@ Sempre antes de deploy, verificar:
 
 - [ ] `backend/Gemfile.lock` está atualizado (`bundle install`)
 - [ ] `backend/Gemfile.lock` está commitado no git
-- [ ] Dockerfiles usam caminhos relativos ao contexto
+- [ ] `pnpm-lock.yaml` está commitado no git
+- [ ] Backend Dockerfile usa caminhos relativos ao contexto (`./backend`)
+- [ ] Frontend Dockerfile usa contexto da raiz (`.`)
 - [ ] Todas as gems necessárias estão no Gemfile
-- [ ] Frontend Dockerfile é standalone (não depende de workspace)
+- [ ] Dependências do Replit podem ser ignoradas em produção
 
 ---
 
