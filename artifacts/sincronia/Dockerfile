@@ -9,22 +9,19 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
-# Copia arquivos globais do workspace
-COPY pnpm-workspace.yaml pnpm-lock.yaml* package.json .env tsconfig*.json ./
+# Copia arquivos relevantes do frontend
+COPY package.json tsconfig*.json vite.config.ts ./
 
-# Copia TODAS as bibliotecas (lib/) pois o workspace depende de múltiplas libs
-COPY lib ./lib
-COPY artifacts/sincronia/package.json ./artifacts/sincronia/
-
-# Instala as dependências (sem frozen-lockfile para permitir resolver arquitetura linux-x64-musl)
-RUN pnpm install --filter "@workspace/sincronia..." --no-frozen-lockfile
-
-# Copia o código fonte do frontend
-COPY artifacts/sincronia ./artifacts/sincronia
+# Tenta copiar dependências do workspace se estiverem no build context
+# IMPORTANTE: Se o build context for restrito, você precisará instalar apenas
+# as dependências deste subprojeto ou alterar o build context no compose.
+COPY src ./src
+COPY public ./public
+COPY index.html ./
 
 # Build da aplicação Vite
-WORKDIR /app/artifacts/sincronia
-RUN pnpm run build
+RUN npm install
+RUN npm run build
 
 # --- Estágio de Produção ---
 FROM node:22-alpine
@@ -34,8 +31,8 @@ WORKDIR /app
 # Instala um servidor estático simples
 RUN npm install -g serve
 
-# Copia apenas os arquivos do build
-COPY --from=build /app/artifacts/sincronia/dist ./dist
+# Copia apenas os arquivos do build (aqui é /app/dist já que no WORKDIR /app acima nós rodamos npm run build)
+COPY --from=build /app/dist ./dist
 
 EXPOSE 3000
 
