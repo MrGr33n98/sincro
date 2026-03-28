@@ -2,7 +2,7 @@
 # Sincronia — Deploy Fix Notes
 # ═══════════════════════════════════════════════════════════════════
 
-## Problema 1: Caminhos COPY incorretos no Dockerfile ✅ RESOLVIDO
+## Problema 1: Caminhos COPY incorretos no Dockerfile (Backend) ✅ RESOLVIDO
 
 **Erro:** `failed to calculate checksum of ref ... "/backend": not found`
 
@@ -51,10 +51,54 @@ git push
 
 ---
 
+## Problema 3: Rails API mode não tem assets:precompile ✅ RESOLVIDO
+
+**Erro:** `Don't know how to build task 'assets:precompile'`
+
+**Causa:** O Rails está em **API mode** e não possui a task `assets:precompile`.
+
+### Solução
+Removida a linha do Dockerfile:
+```dockerfile
+# ANTES (errado)
+RUN SECRET_KEY_BASE=dummy bundle exec rails assets:precompile
+
+# DEPOIS (correto - removido)
+# API mode não precisa de precompile
+```
+
+---
+
+## Problema 4: Dockerfile do frontend com caminhos incorretos ✅ RESOLVIDO
+
+**Erro:** `failed to calculate checksum of ref ... "/artifacts/sincronia": not found`
+
+**Causa:** O Dockerfile do frontend estava tentando copiar arquivos de fora do contexto de build (`./artifacts/sincronia`).
+
+### Antes (Incorreto)
+```dockerfile
+COPY lib ./lib
+COPY artifacts/sincronia ./artifacts/sincronia
+COPY pnpm-workspace.yaml ./
+```
+
+### Depois (Correto - Standalone)
+```dockerfile
+COPY package.json pnpm-lock.yaml* ./
+COPY src ./src
+COPY public ./public
+COPY index.html vite.config.ts tsconfig.json ./
+```
+
+**Explicação:** O frontend agora faz build standalone, sem depender do workspace monorepo.
+
+---
+
 ## Arquivos Modificados
 
-1. `backend/Dockerfile` — Corrigidos os caminhos COPY
+1. `backend/Dockerfile` — Corrigidos os caminhos COPY + removido assets:precompile
 2. `backend/Gemfile.lock` — Atualizado com todas as gems
+3. `artifacts/sincronia/Dockerfile` — Simplificado para build standalone
 
 ---
 
@@ -63,8 +107,9 @@ git push
 ```bash
 # Na raiz do projeto
 docker-compose build backend
-docker-compose up -d backend
-docker-compose logs -f backend
+docker-compose build frontend
+docker-compose up -d
+docker-compose logs -f
 ```
 
 ---
@@ -73,12 +118,19 @@ docker-compose logs -f backend
 
 ```
 sincronia/
-├── docker-compose.yml          # context: ./backend
-└── backend/
-    ├── Dockerfile              # COPY Gemfile ... (não COPY backend/Gemfile)
-    ├── Gemfile
-    ├── Gemfile.lock            # SEMPRE atualizar após mudar Gemfile
-    └── app/
+├── docker-compose.yml
+│   ├── backend: context: ./backend
+│   └── frontend: context: ./artifacts/sincronia
+├── backend/
+│   ├── Dockerfile              # COPY Gemfile ... (não COPY backend/Gemfile)
+│   ├── Gemfile
+│   ├── Gemfile.lock            # SEMPRE atualizar após mudar Gemfile
+│   └── app/
+└── artifacts/sincronia/
+    ├── Dockerfile              # COPY package.json ... (standalone)
+    ├── package.json
+    ├── src/
+    └── dist/                   # Build output
 ```
 
 ---
@@ -89,8 +141,9 @@ Sempre antes de deploy, verificar:
 
 - [ ] `backend/Gemfile.lock` está atualizado (`bundle install`)
 - [ ] `backend/Gemfile.lock` está commitado no git
-- [ ] Dockerfile usa caminhos relativos ao contexto
+- [ ] Dockerfiles usam caminhos relativos ao contexto
 - [ ] Todas as gems necessárias estão no Gemfile
+- [ ] Frontend Dockerfile é standalone (não depende de workspace)
 
 ---
 
