@@ -1,0 +1,25 @@
+# ═══════════════════════════════════════════════════════════════════
+# Sidekiq Configuration
+# ═══════════════════════════════════════════════════════════════════
+
+:concurrency: ${SIDEKIQ_CONCURRENCY:-5}
+:timeout: ${SIDEKIQ_TIMEOUT:-30}
+:verbose: true
+
+:queues:
+  - default
+  - mailers
+  - active_storage_analysis
+  - active_storage_purge
+
+# Development
+:development:
+  :concurrency: 2
+
+# Production
+:production:
+  :concurrency: ${SIDEKIQ_CONCURRENCY:-5}
+
+# Staging
+:staging:
+  :concurrency: 3

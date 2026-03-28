@@ -10,6 +10,7 @@ import Login from "@/pages/login";
 import Register from "@/pages/register";
 import Invite from "@/pages/invite";
 import Join from "@/pages/join";
+import MatchCelebration from "@/pages/match-celebration";
 import Dashboard from "@/pages/dashboard";
 import MoodCheckIn from "@/pages/mood";
 import AIHub from "@/pages/ai-hub";
@@ -18,6 +19,7 @@ import AIMediation from "@/pages/ai-mediation";
 import AIChat from "@/pages/ai-chat";
 import CoupleProfile from "@/pages/couple-profile";
 import Upgrade from "@/pages/upgrade";
+import Settings from "@/pages/settings";
 
 import { setAuthTokenGetter } from "@workspace/api-client-react";
 
@@ -41,6 +43,7 @@ function Router() {
         <Route path="/register" component={Register} />
         <Route path="/invite" component={Invite} />
         <Route path="/join/:token" component={Join} />
+        <Route path="/match" component={MatchCelebration} />
         <Route path="/app" component={Dashboard} />
         <Route path="/mood" component={MoodCheckIn} />
         <Route path="/ai" component={AIHub} />
@@ -49,6 +52,7 @@ function Router() {
         <Route path="/ai/chat" component={AIChat} />
         <Route path="/couple" component={CoupleProfile} />
         <Route path="/upgrade" component={Upgrade} />
+        <Route path="/settings" component={Settings} />
         <Route component={NotFound} />
       </Switch>
     </AppLayout>

@@ -1,100 +1,43 @@
 source 'https://rubygems.org'
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '~> 3.2'
-# CORE
-gem 'logger'
-gem 'rails', '~> 7.2.2'
-gem 'sprockets-rails'
+
+gem 'rails', '~> 7.0.8'
+gem 'pg', '~> 1.1'
 gem 'puma', '>= 5.0'
-gem 'importmap-rails'
-gem 'turbo-rails'
-gem 'stimulus-rails'
-gem 'jbuilder'
 gem 'bootsnap', require: false
 gem 'tzinfo-data', platforms: %i[windows jruby]
-# DATABASE
-gem 'pg', '~> 1.1'
-# AUTENTICACAO E AUTORIZACAO
 gem 'devise', '~> 4.9'
-gem 'devise-two-factor', '~> 5.0'
 gem 'jwt', '~> 3.1'
 gem 'bcrypt', '~> 3.1.20'
-gem 'omniauth-google-oauth2', '~> 1.1'
-gem 'omniauth-linkedin-oauth2', '~> 1.0'
-gem 'omniauth-rails_csrf_protection', '~> 2.0'
-gem 'pundit', '~> 2.3'
-gem 'rqrcode', '~> 2.2'
-# BACKGROUND JOBS E CACHE
 gem 'redis', '~> 5.0'
 gem 'sidekiq', '~> 7.0'
-gem 'sidekiq-scheduler', '~> 5.0'
 gem 'connection_pool', '~> 2.4'
-# ADMIN E API
-gem 'activeadmin', '~> 3.2.0'
-gem 'activeadmin_quill_editor'
-gem 'activeadmin_addons'
+gem 'kaminari'
 gem 'active_model_serializers', '~> 0.10.15'
-gem 'kaminari', '~> 1.2'
-# NOTIFICACOES E REAL-TIME
-gem 'noticed', '~> 2.2'
-# OBSERVABILIDADE E MONITORAMENTO
-gem 'sentry-rails', '~> 5.14'
-gem 'sentry-ruby', '~> 5.14'
-gem 'sentry-sidekiq', '~> 5.14'
-gem 'scout_apm', '~> 6.1'
-gem 'yabeda-prometheus', '~> 0.9'
-gem 'yabeda-puma-plugin', '~> 0.9'
-gem 'yabeda-rails', '~> 0.11'
-gem 'yabeda-sidekiq', '~> 0.12'
-gem 'lograge', '~> 0.12'
-gem 'amazing_print', '~> 1.4'
-# SEGURANCA
-gem 'rack-cors', '~> 2.0', require: 'rack/cors'
-gem 'rack-attack', '~> 6.7'
-gem 'rack-session', '~> 1.0'
-gem 'rackup', '~> 1.0'
-# STORAGE E ARQUIVOS
-gem 'aws-sdk-s3', '~> 1.130', require: false
-gem 'image_processing', '~> 1.2'
-# PAGAMENTOS
-gem 'stripe', '~> 18.0'
-gem 'mercadopago-sdk', '~> 2.3'
-# ANALYTICS
-gem 'mixpanel-ruby', '~> 2.3'
-gem 'posthog-ruby', '~> 3.6'
-gem 'posthog-rails', '~> 3.6'
-# UTILITARIOS
-gem 'paper_trail', '~> 15.0'
-gem 'friendly_id', '~> 5.5'
-gem 'pg_search', '~> 2.3'
+gem 'rack-cors', '~> 2.0'
+gem 'paper_trail', '~> 16.0'
 gem 'dotenv-rails', '~> 3.1'
-gem 'faker', '~> 3.5'
-gem 'cpf_cnpj', '~> 1.0'
-gem 'sassc', '~> 2.4'
-gem 'caxlsx', '~> 3.2'
-gem 'rubyzip', '>= 2.4', '< 3.0'
-# DEVELOPMENT
-group :development do
-  gem 'web-console', '~> 4.2'
-  gem 'rubocop', '~> 1.62', require: false
-  gem 'brakeman', '~> 6.2', require: false
-  gem 'bullet', '~> 7.1'
-end
-# DEVELOPMENT E TEST
+gem 'jbuilder'
+gem 'rack-attack', '~> 6.7'
+gem 'ruby-openai', '~> 7.0'
+gem 'sentry-ruby', '~> 5.0'
+gem 'sentry-rails', '~> 5.0'
+gem 'httparty', '~> 0.21'
+gem 'aws-sdk-s3', '~> 1.0'
+
 group :development, :test do
   gem 'rspec-rails', '~> 6.1'
-  gem 'sqlite3', '~> 1.7'
-  gem 'debug', '~> 1.9', platforms: %i[mri windows]
-  gem 'rswag-api', '~> 2.11'
-  gem 'rswag-specs', '~> 2.11'
-  gem 'rswag-ui', '~> 2.11'
-end
-# TEST
-group :test do
-  gem 'capybara', '~> 3.40'
-  gem 'selenium-webdriver'
-  gem 'webdrivers'
-  gem 'simplecov', '~> 0.22', require: false
-  gem 'simplecov-console', require: false
   gem 'factory_bot_rails', '~> 6.4'
+  gem 'faker', '~> 3.2'
+end
+
+group :development do
+  gem 'web-console', '~> 4.2'
+  gem 'bullet', '~> 7.1'
+end
+
+group :test do
+  gem 'capybara'
+  gem 'selenium-webdriver'
+  gem 'simplecov', require: false
 end
