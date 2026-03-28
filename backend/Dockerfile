@@ -25,13 +25,13 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 WORKDIR /app
 
 # Install dependencies
-COPY backend/Gemfile backend/Gemfile.lock ./
+COPY Gemfile Gemfile.lock ./
 RUN bundle config set without 'development test' && \
     bundle install -j4 --retry 3 && \
     rm -rf /usr/local/bundle/cache
 
 # Copy application code
-COPY backend/ ./
+COPY . ./
 
 # Precompile assets
 RUN SECRET_KEY_BASE=dummy bundle exec rails assets:precompile
@@ -60,9 +60,9 @@ RUN apt-get update -qq && \
 
 RUN bundle config unset without
 
-COPY backend/Gemfile backend/Gemfile.lock ./
+COPY Gemfile Gemfile.lock ./
 RUN bundle install -j4 --retry 3
 
-COPY backend/ ./
+COPY . ./
 
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0", "-p", "3001"]
