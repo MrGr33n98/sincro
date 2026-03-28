@@ -199,4 +199,25 @@ Sempre antes de deploy, verificar:
 
 ---
 
+## Problema 7: Frontend package.json com catalog: e workspace: refs ✅ RESOLVIDO
+
+**Erro:** `ERR_PNPM_CATALOG_ENTRY_NOT_FOUND_FOR_SPEC No catalog entry '@replit/vite-plugin-cartographer' was found for catalog 'default'.`
+
+**Causa:** O Dockerfile do frontend agora age como um projeto standalone fora do workspace monorepo para simplificar o build, mas o `package.json` original usava a feature de "catalog" do PNPM que só existe dentro de um workspace.
+
+### Solução
+Substituídas todas as referências `catalog:` pelas versões reais definidas no `pnpm-workspace.yaml` e removidas dependências de `@workspace/*`.
+
+```json
+// Antes
+"@replit/vite-plugin-cartographer": "catalog:",
+
+// Depois
+"@replit/vite-plugin-cartographer": "^0.5.1",
+```
+
+Isso permitiu que o `pnpm install` funcionasse corretamente dentro do container Docker sem depender da estrutura completa do monorepo.
+
+---
+
 *Correções aplicadas em 2026-03-28*
