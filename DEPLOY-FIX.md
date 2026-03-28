@@ -2,7 +2,7 @@
 # Sincronia — Deploy Fix Notes
 # ═══════════════════════════════════════════════════════════════════
 
-## Problema Corrigido
+## Problema 1: Caminhos COPY incorretos no Dockerfile ✅ RESOLVIDO
 
 **Erro:** `failed to calculate checksum of ref ... "/backend": not found`
 
@@ -24,9 +24,37 @@ COPY . ./
 
 ---
 
-## Arquivo Modificado
+## Problema 2: Gemfile.lock desatualizado ✅ RESOLVIDO
 
-- `backend/Dockerfile` — Corrigidos os caminhos COPY
+**Erro:** `Could not find gem 'factory_bot_rails (~> 6.4)' in locally installed gems`
+
+**Causa:** O `Gemfile.lock` não foi atualizado/commitado após adicionar novas gems ao Gemfile.
+
+### Gems Adicionadas
+- `rack-attack` - Rate limiting
+- `ruby-openai` - OpenAI API
+- `sentry-ruby` - Error tracking
+- `sentry-rails` - Rails integration
+- `httparty` - HTTP client
+- `aws-sdk-s3` - S3 backup
+- `factory_bot_rails` - Test factories
+- `faker` - Test data
+
+### Solução
+```bash
+cd backend
+bundle install
+git add Gemfile.lock
+git commit -m "fix: atualiza Gemfile.lock com novas dependências"
+git push
+```
+
+---
+
+## Arquivos Modificados
+
+1. `backend/Dockerfile` — Corrigidos os caminhos COPY
+2. `backend/Gemfile.lock` — Atualizado com todas as gems
 
 ---
 
@@ -41,26 +69,6 @@ docker-compose logs -f backend
 
 ---
 
-## Próximo Deploy
-
-O próximo deploy no GitHub Actions deve funcionar corretamente.
-
-Se ainda houver erro, verifique:
-
-1. **Gemfile.lock está no repositório:**
-   ```bash
-   git ls-files backend/Gemfile.lock
-   ```
-
-2. **Faça commit e push das mudanças:**
-   ```bash
-   git add backend/Dockerfile
-   git commit -m "fix: corrige caminhos COPY no Dockerfile"
-   git push
-   ```
-
----
-
 ## Estrutura Correta do Build Context
 
 ```
@@ -69,10 +77,21 @@ sincronia/
 └── backend/
     ├── Dockerfile              # COPY Gemfile ... (não COPY backend/Gemfile)
     ├── Gemfile
-    ├── Gemfile.lock
+    ├── Gemfile.lock            # SEMPRE atualizar após mudar Gemfile
     └── app/
 ```
 
 ---
 
-*Correção aplicada em 2026-03-28*
+## Checklist Pré-Deploy
+
+Sempre antes de deploy, verificar:
+
+- [ ] `backend/Gemfile.lock` está atualizado (`bundle install`)
+- [ ] `backend/Gemfile.lock` está commitado no git
+- [ ] Dockerfile usa caminhos relativos ao contexto
+- [ ] Todas as gems necessárias estão no Gemfile
+
+---
+
+*Correções aplicadas em 2026-03-28*
