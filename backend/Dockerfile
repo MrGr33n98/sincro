@@ -16,7 +16,7 @@ RUN apt-get update -qq && \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js for assets
+# Install Node.js for assets (if needed)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
@@ -32,9 +32,6 @@ RUN bundle config set without 'development test' && \
 
 # Copy application code
 COPY . ./
-
-# Precompile assets
-RUN SECRET_KEY_BASE=dummy bundle exec rails assets:precompile
 
 # Expose port
 EXPOSE 3001
