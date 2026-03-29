@@ -140,6 +140,25 @@ const basePath = process.env.BASE_PATH || "/";
 
 ---
 
+## Problema 7: Script preinstall não funciona no Windows ✅ RESOLVIDO
+
+**Erro:** `'sh' is not recognized as an internal or external command`
+
+**Causa:** O script `preinstall` usava `sh -c` que é específico do Unix/Linux.
+
+### Solução
+Reescrever o script em JavaScript puro:
+
+```json
+// Antes (Unix-only)
+"preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case ...'"
+
+// Depois (Cross-platform)
+"preinstall": "node -e \"const fs=require('fs');['package-lock.json','yarn.lock'].forEach(f=>{try{fs.unlinkSync(f)}catch(e){}});if(!process.env.npm_config_user_agent.startsWith('pnpm/')){console.error('Use pnpm instead');process.exit(1)}\""
+```
+
+---
+
 ## Arquivos Modificados
 
 1. `backend/Dockerfile` — Corrigidos os caminhos COPY + removido assets:precompile
@@ -147,6 +166,8 @@ const basePath = process.env.BASE_PATH || "/";
 3. `artifacts/sincronia/Dockerfile` — Usa contexto da raiz (workspace monorepo)
 4. `docker-compose.yml` — Frontend context alterado para `.`
 5. `artifacts/sincronia/vite.config.ts` — PORT e BASE_PATH opcionais em CI
+6. `.npmrc` — Adicionado shamefully-hoist=true
+7. `package.json` — Script preinstall cross-platform
 
 ---
 
